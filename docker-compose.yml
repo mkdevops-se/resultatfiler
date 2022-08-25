@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:6.2
+    healthcheck:
+      test: "redis-cli ping"
+      interval: 1s
+      retries: 20
+    ports:
+      - "6379:6379"
