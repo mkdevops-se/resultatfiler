@@ -133,3 +133,4 @@ temp
 tmp
 *.json
 *.sha256
+*.md5
