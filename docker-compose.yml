@@ -8,4 +8,9 @@ services:
       interval: 1s
       retries: 20
     ports:
-      - "6379:6379"
+      - target: 6379
+        published: 6379
+        protocol: tcp
+        mode: host
+    volumes:
+      - ${PWD}/redis_data:/data

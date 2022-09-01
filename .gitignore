@@ -129,8 +129,9 @@ dmypy.json
 .pyre/
 
 # Project files
-temp
-tmp
+redis_data
+temp*
+tmp*
 *.json
 *.sha256
 *.md5
