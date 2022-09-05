@@ -14,3 +14,71 @@ services:
         mode: host
     volumes:
       - ${PWD}/redis_data:/data
+
+  elasticsearch_master:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
+    container_name: elasticsearch_master
+    environment:
+      - cluster.name=resultatfiler
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # Change to 4g in production.
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    ports:
+      - 9200:9200
+    volumes:
+      - elasticsearch_master:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  elasticsearch_slave:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
+    container_name: elasticsearch_slave
+    environment:
+      - cluster.name=resultatfiler
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # Change to 4g in production.
+      - "discovery.zen.ping.unicast.hosts=elasticsearch_master"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    volumes:
+      - elasticsearch_slave:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.6.3
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_REQUESTTIMEOUT=90000
+      - ELASTICSEARCH_URL=http://elasticsearch_master:9200
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_GRAPH_ENABLED=false
+      - XPACK_ML_ENABLED=false
+      - XPACK_REPORTING_ENABLED=false
+    ports:
+      - 5601:5601
+    networks:
+      - elastic
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch_master
+
+volumes:
+  elasticsearch_master:
+    driver: local
+  elasticsearch_slave:
+    driver: local
+
+networks:
+  elastic:
