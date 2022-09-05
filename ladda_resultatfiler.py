@@ -21,9 +21,14 @@ from processa_resultatfiler import processa_resultatfil
 
 queue = rq.Queue(connection=redis.Redis())
 
+default_headers = {
+    'User-Agent': 'Din van i noden, Python Requests och RQ',
+    'X-Username': 'mblomdahl'
+}
+
 def _hamta_indexfil(indexurl: str):
     index_ts = datetime.datetime.utcnow()
-    indexfil = requests.get(indexurl)
+    indexfil = requests.get(indexurl, headers=default_headers)
     click.echo(f'Indexfil inläst med status {indexfil.status_code}, '
                f'bytes: {len(indexfil.content)} ({index_ts.isoformat()}).')
     if indexfil.status_code != 200:
@@ -49,7 +54,7 @@ def _download_and_enqueue(task):
     download_ts = datetime.datetime.utcnow()
     click.echo(f'Ladda ner {task["zip_url"]} till {task["zip_file_path"]} '
                f'({download_ts.isoformat()}) ...')
-    zipfil = requests.get(task['zip_url'], stream=True)
+    zipfil = requests.get(task['zip_url'], headers=default_headers, stream=True)
     os.makedirs(os.path.dirname(task['zip_file_path']), exist_ok=True)
     with open(task['zip_file_path'], 'wb') as local_file:
         shutil.copyfileobj(zipfil.raw, local_file)
