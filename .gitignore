@@ -130,6 +130,7 @@ dmypy.json
 
 # Project files
 redis_data
+20220911
 temp*
 tmp*
 *.json
