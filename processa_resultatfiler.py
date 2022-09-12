@@ -11,21 +11,23 @@ import json
 import zipfile
 
 import click
-import elasticsearch
+#import elasticsearch
 
-es = elasticsearch.Elasticsearch()
-health = es.cluster.health()
-if __name__ != '__main__':
-    click.echo(f'Hälsa för Elasticsearch-kluster "{health["cluster_name"]}", '
-               f'status={health["status"]}.')
+#es = elasticsearch.Elasticsearch()
+#health = es.cluster.health()
+#if __name__ != '__main__':
+#    click.echo(f'Hälsa för Elasticsearch-kluster "{health["cluster_name"]}", '
+#               f'status={health["status"]}.')
 
-def _save_datfor(datfor_full: object):
-    '''Formattera DATFOR-dokument och spara i Elasticsearch.'''
+def _save_mandatfordelning(mandatfordelning_full: object):
+    '''Formattera mandatfördelning-dokument och spara i t.ex. Elasticsearch.'''
     pass
+    # TODO: Logic for document handling.
 
-def _save_ostfor(ostfor_full: object):
-    '''Formattera OSTFOR-dokument och spara i Elasticsearch.'''
+def _save_rostfordelning(rostfordelning_full: object):
+    '''Formattera rostfördelning-dokument och spara i t.ex. Elasticsearch.'''
     pass
+    # TODO: Logic for document handling.
 
 def processa_resultatfil(zip_file_path: str, zip_hash: str, zip_url: str, zip_timestamp: str):
     '''Processa en resultat-zipfil.'''
@@ -38,22 +40,22 @@ def processa_resultatfil(zip_file_path: str, zip_hash: str, zip_url: str, zip_ti
         for member_name in zip_ref.namelist():
             if not member_name.endswith('.json'):
                 continue
-            if 'datfor' in member_name:
-                with zip_ref.open(member_name) as datfor_json:
-                    datfor = json.loads(datfor_json.read())
-                    update_ts = datfor['senasteUppdateringstid']
-                    updates_count = datfor['antalUppdateringar']
+            if 'mandatfordelning' in member_name:
+                with zip_ref.open(member_name) as mandatfordelning_json:
+                    mandatfordelning = json.loads(mandatfordelning_json.read())
+                    update_ts = mandatfordelning['senasteUppdateringstid']
+                    updates_count = mandatfordelning['antalUppdateringar']
                     click.echo(f'Öppnat och deserialiserat {member_name} med '
                                f'uppdateringstid {update_ts} och {updates_count} uppdateringar')
-                    _save_datfor(datfor)
-            if 'ostfor' in member_name:
-                with zip_ref.open(member_name) as ostfor_json:
-                    ostfor = json.loads(ostfor_json.read())
-                    update_ts = ostfor['senasteUppdateringstid']
-                    updates_count = ostfor['antalUppdateringar']
+                    _save_mandatfordelning(mandatfordelning)
+            if 'rostfordelning' in member_name:
+                with zip_ref.open(member_name) as rostfordelning_json:
+                    rostfordelning = json.loads(rostfordelning_json.read())
+                    update_ts = rostfordelning['senasteUppdateringstid']
+                    updates_count = rostfordelning['antalUppdateringar']
                     click.echo(f'Öppnat och deserialiserat {member_name} med '
                                f'uppdateringstid {update_ts} och {updates_count} uppdateringar')
-                    _save_ostfor(ostfor)
+                    _save_rostfordelning(rostfordelning)
 
 
 @click.command()
