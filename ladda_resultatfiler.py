@@ -90,7 +90,7 @@ def _download_and_enqueue(task):
 
 @click.command()
 @click.argument('indexfil_domain', type=click.STRING)
-@click.argument('output_dir', type=click.Path(file_okay=False, resolve_path=True, writable=True))
+@click.argument('output_dir', type=click.Path(file_okay=False, writable=True))
 @click.option('-p', '--poll_interval', default=30, type=click.IntRange(0, 3600),
               help='Polla med intervall av N sekunder, inaktivera med 0')
 def ladda_ner_resultatfiler(indexfil_domain: str = None, output_dir: str = None,
