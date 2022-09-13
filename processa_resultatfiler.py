@@ -8,6 +8,9 @@ Ett program för att processera resultatfiler.
 '''
 
 import json
+import os
+import sys
+import traceback
 import zipfile
 
 import click
@@ -43,10 +46,12 @@ def processa_resultatfil(zip_file_path: str, zip_hash: str, zip_url: str, zip_ti
     '''Processa en resultat-zipfil.'''
 
     click.echo(f'Processa fil {zip_file_path} från {zip_url} med hash {zip_hash} ({zip_timestamp})')
+    if not os.path.exists(zip_file_path):
+        raise AssertionError(f'Sökvägen {zip_file_path} existerar inte')
 
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         if zip_ref.testzip():
-            raise Exception(f'Korrupt zipfil, "{repr(zip_ref.testzip())}"')
+            raise AssertionError(f'Korrupt zipfil, "{repr(zip_ref.testzip())}"')
         for member_name in zip_ref.namelist():
             if not member_name.endswith('.json'):
                 continue
@@ -79,14 +84,25 @@ def processa_resultatfil(zip_file_path: str, zip_hash: str, zip_url: str, zip_ti
 
 
 @click.command()
-@click.argument('zip_file_paths', nargs=-1,
-                type=click.Path(dir_okay=False, resolve_path=True, readable=True))
-def processa_resultatfiler(zip_file_paths: list = None):
-    '''Processa en uppsättning med zipfiler.'''
+@click.argument('log_file_paths', nargs=-1,
+                type=click.Path(dir_okay=False, readable=True))
+def processa_resultatfiler(log_file_paths: list = None):
+    '''Processa en uppsättning zipfiler från nedladdningslogg.'''
 
-    for zip_file_path in zip_file_paths:
-        processa_resultatfil(zip_file_path, zip_file_path.split('-')[-1], 'okänd', 'okänd')
-
+    for log_file_path in log_file_paths:
+        with open(log_file_path, 'r', encoding='utf-8') as task_log_file:
+            log_task_count = 0
+            for task_log_entry in task_log_file.readlines():
+                log_task_count += 1
+                task = json.loads(task_log_entry)
+                try:
+                    processa_resultatfil(
+                        task['zip_file_path'], task['zip_hash'], task['zip_url'], task['zip_ts']
+                    )
+                except (AssertionError, zipfile.BadZipFile) as err:
+                    print(f'Fel vid processering av zipfil {task["zip_file_path"]} från '
+                          f'{log_file_path}, rad {log_task_count}: '
+                          f'{traceback.format_exception_only(err)}', file=sys.stderr)
 
 if __name__ == '__main__':
     processa_resultatfiler()

@@ -17,3 +17,9 @@ Förutsättningar: Mac eller Linux med Git LFS, Docker Compose och Python 3.8+, 
     # Starta worker-processen
     rq worker --with-scheduler
 
+Eller, för att processera igenom arkiverade resultatfiler baserat på nedladdningsloggarna:
+
+    tar xf 20220911/*_resultatfiler.tgz
+    ./processa_resultatfiler.py 20220911/tasks-220911T*.log > process.log 2> error.log
+
+(Körtid cirka 5 minuter.)
