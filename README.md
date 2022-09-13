@@ -12,7 +12,7 @@ Python-program för att ladda ner resultatfiler (och spara dem i Elasticsearch, 
     . venv/bin/activate
     pip install -r requirements.txt
     # Läs in filerna
-    ./ladda_resultatfiler.py my.domain.com output_folder
+    ./ladda_resultatfiler.py resultat.val.se 20220911
     # Starta worker-processen
     rq worker --with-scheduler
 

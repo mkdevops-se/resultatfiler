@@ -19,13 +19,23 @@ import click
 #    click.echo(f'Hälsa för Elasticsearch-kluster "{health["cluster_name"]}", '
 #               f'status={health["status"]}.')
 
-def _save_mandatfordelning(mandatfordelning_full: object):
-    '''Formattera mandatfördelning-dokument och spara i t.ex. Elasticsearch.'''
+def _save_prel_mandatfordelning(mandatfordelning_full: object):
+    '''Formattera prel. mandatfördelning-dokument och spara i t.ex. Elasticsearch.'''
     pass
     # TODO: Logic for document handling.
 
-def _save_rostfordelning(rostfordelning_full: object):
-    '''Formattera rostfördelning-dokument och spara i t.ex. Elasticsearch.'''
+def _save_prel_rostfordelning(rostfordelning_full: object):
+    '''Formattera prel. rostfördelning-dokument och spara i t.ex. Elasticsearch.'''
+    pass
+    # TODO: Logic for document handling.
+
+def _save_slutl_mandatfordelning(mandatfordelning_full: object):
+    '''Formattera slutlig mandatfördelning-dokument och spara i t.ex. Elasticsearch.'''
+    pass
+    # TODO: Logic for document handling.
+
+def _save_slutl_rostfordelning(rostfordelning_full: object):
+    '''Formattera slutlig rostfördelning-dokument och spara i t.ex. Elasticsearch.'''
     pass
     # TODO: Logic for document handling.
 
@@ -47,7 +57,12 @@ def processa_resultatfil(zip_file_path: str, zip_hash: str, zip_url: str, zip_ti
                     updates_count = mandatfordelning['antalUppdateringar']
                     click.echo(f'Öppnat och deserialiserat {member_name} med '
                                f'uppdateringstid {update_ts} och {updates_count} uppdateringar')
-                    _save_mandatfordelning(mandatfordelning)
+                    if 'preliminar' in member_name:
+                        _save_prel_mandatfordelning(mandatfordelning)
+                    elif 'slutlig' in member_name:
+                        _save_slutl_mandatfordelning(mandatfordelning)
+                    else:
+                        raise AssertionError(f'Felaktigt filnamn {member_name}')
             if 'rostfordelning' in member_name:
                 with zip_ref.open(member_name) as rostfordelning_json:
                     rostfordelning = json.loads(rostfordelning_json.read())
@@ -55,7 +70,12 @@ def processa_resultatfil(zip_file_path: str, zip_hash: str, zip_url: str, zip_ti
                     updates_count = rostfordelning['antalUppdateringar']
                     click.echo(f'Öppnat och deserialiserat {member_name} med '
                                f'uppdateringstid {update_ts} och {updates_count} uppdateringar')
-                    _save_rostfordelning(rostfordelning)
+                    if 'preliminar' in member_name:
+                        _save_prel_rostfordelning(rostfordelning)
+                    elif 'slutlig' in member_name:
+                        _save_slutl_rostfordelning(rostfordelning)
+                    else:
+                        raise AssertionError(f'Felaktigt filnamn {member_name}')
 
 
 @click.command()
