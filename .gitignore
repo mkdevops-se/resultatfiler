@@ -130,7 +130,9 @@ dmypy.json
 
 # Project files
 redis_data
-20220911
+20220911/p
+20220911/s
+!20220911/*.log
 temp*
 tmp*
 *.json
