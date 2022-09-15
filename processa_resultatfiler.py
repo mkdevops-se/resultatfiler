@@ -101,8 +101,8 @@ def processa_resultatfiler(log_file_paths: list = None):
                     )
                 except (AssertionError, zipfile.BadZipFile) as err:
                     print(f'Fel vid processering av zipfil {task["zip_file_path"]} från '
-                          f'{log_file_path}, rad {log_task_count}: '
-                          f'{traceback.format_exception_only(err)}', file=sys.stderr)
+                          f'{log_file_path}, rad {log_task_count}:\n'
+                          f'{traceback.format_exc()}', file=sys.stderr)
 
 if __name__ == '__main__':
     processa_resultatfiler()
